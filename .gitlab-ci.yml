@@ -1,0 +1,16 @@
+image: golang:1.13
+
+unit_test:
+  stage: test
+  script:
+    - make test
+
+race_test:
+  stage: test
+  script:
+    - make race
+
+lint_check:
+  stage: test
+  script:
+    - make lint
