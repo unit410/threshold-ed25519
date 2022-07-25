@@ -5,8 +5,8 @@ import (
 	"crypto/sha512"
 	"math/big"
 
-	"gitlab.com/polychainlabs/edwards25519"
-	"gitlab.com/polychainlabs/threshold-ed25519/internal/util"
+	"gitlab.com/unit410/edwards25519"
+	"gitlab.com/unit410/threshold-ed25519/internal/util"
 )
 
 var (
