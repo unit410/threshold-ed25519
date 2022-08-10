@@ -1,9 +1,13 @@
-GOLINT:=$(shell go list -f {{.Target}} golang.org/x/lint/golint)
-
 all: test
 
+tools:
+	go install github.com/kisielk/errcheck@latest
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2
+
 lint: tools
-	@$(GOLINT) -set_exit_status ./...
+	go fmt ./...
+	golangci-lint run -c ./.golangci.yml
 
 test:
 	@go test -short ./...
@@ -13,8 +17,5 @@ race:
 
 msan:
 	@go test -msan -short ./...
-
-tools:
-	@go install golang.org/x/lint/golint
 
 .PHONY: all lint test race msan tools

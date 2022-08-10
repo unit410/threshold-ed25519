@@ -1,0 +1,43 @@
+run:
+  concurrency: 8
+  timeout: 5m
+  issues-exit-code: 30
+  tests: false
+  skip-dirs:
+  - testdata
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
+  format: colored-line-number
+
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+  # make issues output unique by line, default is true
+  uniq-by-line: true
+linters:
+  # please, do not use `enable-all`: it's deprecated and will be removed soon.
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  enable:
+  - errcheck
+  - errchkjson
+  - errname
+  - errorlint
+  - govet
+  - staticcheck
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+    disable-default-exclusions: true
+    exclude-functions:
+    - (hash.Hash).Write
+  errorlint:
+    errorf: true
+    comparison: true
+  staticcheck:
+    checks:
+    - all
