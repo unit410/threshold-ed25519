@@ -215,10 +215,10 @@ func TestInvalid1Of3(t *testing.T) {
 
 // TestKeyLeakage by signing a message with threshold shares,
 // then sign the same message with an invalid public key for the assembled key
-// the resulting leaked value should be the ephemeral public key which is public
-// this is more of a sanity test than anything else because presumably if you can substitute a malicious key, you
-// could just steal the private key shares in the first place. In the case of a developer mishap, only the
-// ephemeral public key is leaked which should not cause concern.
+// the resulting R values of the signatures should be equivalent to each other and the ephemeral public key which is public
+// this is more of a sanity test than anything else because presumably if you can substitute a malicious key,
+// you could just steal the private key shares in the first place. In the case of a developer mishap,
+// only the ephemeral public key can be derived by comparing the R value of the signatures which should not cause concern.
 func TestKeyLeakage(t *testing.T) {
 	signWithAllShares := func(
 		shares []Scalar,
@@ -253,9 +253,10 @@ func TestKeyLeakage(t *testing.T) {
 	}
 }
 
-// TestShareLeakageByEphemeralKey ensures that R signature values are not leaked by varying the ephemeral public key
-// used in threshold signing.
-func TestShareLeakageByEphemeralKey(t *testing.T) {
+// TestShareEquivalenceByEphemeralKey generates two share signatures varied by the ephemeral public key
+// These should not be equivalent, but this does not prove that any resulting signatures would be valid or invalid
+// additionally it does not prove that the resulting signature would fail to leak any information
+func TestShareEquivalenceByEphemeralKey(t *testing.T) {
 	message := []byte("Hello World!")
 	keyPair := generateKeyPairWithShares(t)
 	ephKeyPair := generateKeyPairWithShares(t)
@@ -264,12 +265,14 @@ func TestShareLeakageByEphemeralKey(t *testing.T) {
 	// can we vary ephPublicKey and get r?
 	shareSig0 := SignWithShare(message, keyPair.shares[0], ephKeyPair.shares[0], keyPair.publicKey, ephKeyPair.publicKey)
 	shareSig0Mal := SignWithShare(message, keyPair.shares[0], ephKeyPair.shares[0], keyPair.publicKey, ephKeyPairMal.publicKey)
-	require.NotEqual(t, hex.EncodeToString(shareSig0), hex.EncodeToString(shareSig0Mal))
+	require.NotEqual(t, hex.EncodeToString(shareSig0), hex.EncodeToString(shareSig0Mal), "signature with two different pubkeys are equivalent")
 }
 
-// TestShareLeakageByEphemeralKeyShare ensures that R signature values are not leaked by varying the
+// TestShareEquivalenceByEphemeralKeyShare ensures that R signature values are not leaked by varying the
 // ephemeral public key share used in threshold signing
-func TestShareLeakageByEphemeralKeyShare(t *testing.T) {
+// These should not be equivalent, but this does not prove that any resulting signatures would be valid or invalid
+// additionally it does not prove that the resulting signature would fail to leak any information
+func TestShareEquivalenceByEphemeralKeyShare(t *testing.T) {
 	message := []byte("Hello World!")
 	keyPair := generateKeyPairWithShares(t)
 	ephKeyPair := generateKeyPairWithShares(t)
@@ -278,5 +281,5 @@ func TestShareLeakageByEphemeralKeyShare(t *testing.T) {
 	// Can we vary ephShares and get r?
 	shareSig0 := SignWithShare(message, keyPair.shares[0], ephKeyPair.shares[0], keyPair.publicKey, ephKeyPair.publicKey)
 	shareSig0Mal := SignWithShare(message, keyPair.shares[0], ephKeyPairMal.shares[0], keyPair.publicKey, ephKeyPairMal.publicKey)
-	require.NotEqual(t, hex.EncodeToString(shareSig0), hex.EncodeToString(shareSig0Mal))
+	require.NotEqual(t, hex.EncodeToString(shareSig0), hex.EncodeToString(shareSig0Mal), "signature with two different ephemeral pubkeys are equivalent")
 }
